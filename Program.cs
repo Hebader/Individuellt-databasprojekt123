@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Formats.Asn1;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -421,6 +422,7 @@ namespace Individuellt_databasprojekt123
                     int studentId = 1; // Sätter värde på önskad student
                     int courseId = 2;
 
+                 
                     //Kommandot som ska köras när koden exekveras, skapar en sql-fråga
                     command.CommandText = @" 
                             UPDATE Grades
@@ -431,14 +433,17 @@ namespace Individuellt_databasprojekt123
                     command.Parameters.AddWithValue("@StudentID", studentId); // Tilldelar värden till sql-frågan
                     command.Parameters.AddWithValue("@CourseID", courseId);
 
+                    Console.WriteLine($"Do you want to set grade for studentId: {studentId} in courseId: {courseId}? Enter yes/no.");
+                    string answer = Console.ReadLine();
                     int rowsAffected = command.ExecuteNonQuery(); // exekverar mot databasen och reslutat av antal rader som påverkats
-                    if (rowsAffected == 0)
+                    if (rowsAffected == 0 || answer == "no")
                     {
                         Console.WriteLine("The student is not registered in the specified course.");
                     }
-                    else
+                    else if (answer == "yes" && rowsAffected > 0)
                     {
                         transaction.Commit(); //Om minst en rad påervkats
+                        Console.WriteLine($"Setingt grade for studentid:{studentId} in courseid:{courseId}. ");
                         Console.WriteLine("Grade updated successfully.\n"); //Bekräftar transaktionen
                     }
 
