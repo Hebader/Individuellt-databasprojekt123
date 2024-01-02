@@ -414,6 +414,7 @@ namespace Individuellt_databasprojekt123
 
                 SqlTransaction transaction = connection.BeginTransaction(); //Påbröjar en transaktion 
 
+
                 try // Har en try/catch ifall transktionen misslyckas
                 {
                     SqlCommand command = connection.CreateCommand(); //Skapar ett Sqlcommand objekt som kopplas till connection
@@ -422,31 +423,40 @@ namespace Individuellt_databasprojekt123
                     int studentId = 1; // Sätter värde på önskad student
                     int courseId = 2;
 
-                 
-                    //Kommandot som ska köras när koden exekveras, skapar en sql-fråga
-                    command.CommandText = @" 
+                    Console.WriteLine($"Do you want us to update grade for studentId: {studentId} in courseId: {courseId}? Enter yes/no.");
+                    string answer = Console.ReadLine();
+
+                    if (answer == "yes")
+                    {
+                        //Kommandot som ska köras när koden exekveras, skapar en sql-fråga
+                        command.CommandText = @" 
                             UPDATE Grades
                             SET Grade = '3'
                             WHERE FKStudentID = @StudentID
                             AND FKCourseID = @CourseID";
 
-                    command.Parameters.AddWithValue("@StudentID", studentId); // Tilldelar värden till sql-frågan
-                    command.Parameters.AddWithValue("@CourseID", courseId);
+                        command.Parameters.AddWithValue("@StudentID", studentId); // Tilldelar värden till sql-frågan
+                        command.Parameters.AddWithValue("@CourseID", courseId);
 
-                    Console.WriteLine($"Do you want to set grade for studentId: {studentId} in courseId: {courseId}? Enter yes/no.");
-                    string answer = Console.ReadLine();
-                    int rowsAffected = command.ExecuteNonQuery(); // exekverar mot databasen och reslutat av antal rader som påverkats
-                    if (rowsAffected == 0 || answer == "no")
-                    {
-                        Console.WriteLine("The student is not registered in the specified course.");
-                    }
-                    else if (answer == "yes" && rowsAffected > 0)
-                    {
-                        transaction.Commit(); //Om minst en rad påervkats
-                        Console.WriteLine($"Setingt grade for studentid:{studentId} in courseid:{courseId}. ");
-                        Console.WriteLine("Grade updated successfully.\n"); //Bekräftar transaktionen
-                    }
 
+                        int rowsAffected = command.ExecuteNonQuery(); // exekverar mot databasen och reslutat av antal rader som påverkats
+                        if (rowsAffected == 0)
+                        {
+                            Console.WriteLine("The student is not registered in the specified course.");
+                        }
+                        else
+                        {
+
+                            transaction.Commit(); //Om minst en rad påervkats
+                            Console.WriteLine($"Uppdating grade for studentid:{studentId} in courseid:{courseId}. ");
+                            Console.WriteLine("Grade updated successfully.\n"); //Bekräftar transaktionen
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("You typed 'no' for updating the grade.");
+                    }
                 }
                 catch (Exception ex)
                 {
